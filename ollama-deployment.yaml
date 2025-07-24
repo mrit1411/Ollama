@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+        - name: ollama
+          image: ollama-gemma:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 11434
+          env:
+            - name: OLLAMA_NUM_PARALLEL
+              value: "4"
+        - name: metrics-exporter
+          image: ollama-exporter:latest  #
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-service
+  labels:
+    app: ollama
+    release: prom  #
+spec:
+  type: LoadBalancer
+  selector:
+    app: ollama
+  ports:
+    - name: http-ollama
+      port: 11434
+      targetPort: 11434
+      nodePort: 32387
+    - name: metrics
+      port: 8000
+      targetPort: 8000

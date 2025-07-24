@@ -1,0 +1,16 @@
+# Dockerfile.exporter
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy the exporter script
+COPY metrics_exporter.py .
+
+# Install required Python packages
+RUN pip install --no-cache-dir flask requests
+
+EXPOSE 8000
+
+# Run the exporter
+CMD ["python", "metrics_exporter.py"]

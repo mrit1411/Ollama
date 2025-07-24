@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ollama-alerts
+  labels:
+    release: prom
+spec:
+  groups:
+    - name: ollama.rules
+      rules:
+        - alert: HighLatencyOllama
+          expr: ollama_avg_delay_seconds > 2
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High LLM latency detected"
+            description: "The average delay has exceeded 2 seconds for over 1 minute."
+
+        - alert: TimeoutSpikeOllama
+          expr: rate(ollama_request_timeouts[2m]) > 5
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Spike in timeout errors"
+            description: "There were more than 5 timeout errors per second over the last 2 minutes."
+
+        - alert: ZeroActiveUsers
+          expr: ollama_active_users == 0
+          for: 5m
+          labels:
+            severity: info
+          annotations:
+            summary: "No active users detected"
+            description: "There have been 0 active users for the last 5 minutes."

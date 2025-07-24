@@ -1,0 +1,10 @@
+rules:
+  custom:
+    - seriesQuery: 'ollama_avg_delay_seconds'
+      resources:
+        overrides:
+          namespace: {resource: "namespace"}
+      name:
+        matches: "ollama_avg_delay_seconds"
+        as: "ollama_avg_delay_seconds"
+      metricsQuery: 'avg(ollama_avg_delay_seconds)'

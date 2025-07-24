@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ollama-servicemonitor
+  labels:
+    release: prom
+spec:
+  selector:
+    matchLabels:
+      app: ollama
+  endpoints:
+    - port: metrics
+      interval: 15s
+

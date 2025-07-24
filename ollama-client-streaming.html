@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ollama Streaming Prompt Tester</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #111;
+      color: #eee;
+      padding: 2rem;
+    }
+    textarea, input, select, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      background-color: #222;
+      color: #eee;
+    }
+    button {
+      background-color: #0077ff;
+      cursor: pointer;
+    }
+    pre {
+      background-color: #222;
+      padding: 1rem;
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>💬 Ollama Public Prompt Tester (Streaming)</h2>
+
+  <label for="endpoint">Public Ngrok Endpoint (no trailing slash):</label>
+  <input type="text" id="endpoint" value="https://e7b4ff0168d7.ngrok-free.app" /> 
+
+  <label for="model">Select Model:</label>
+  <select id="model">
+    <option value="gemma:2b">gemma:2b</option>
+    <option value="llama3">llama3</option>
+    <option value="mistral">mistral</option>
+    <!-- Add more options as needed -->
+  </select>
+
+  <label for="prompt">Enter your prompt:</label>
+  <textarea id="prompt" rows="4">Say hello from streaming frontend</textarea>
+
+  <button onclick="sendPrompt()">Submit Prompt</button>
+
+  <h3>🧾 Response:</h3>
+  <pre id="responseBox">Waiting...</pre>
+
+  <script>
+    async function sendPrompt() {
+      const endpoint = document.getElementById("endpoint").value.trim();
+      const prompt = document.getElementById("prompt").value.trim();
+      const model = document.getElementById("model").value;
+      const responseBox = document.getElementById("responseBox");
+
+      if (!endpoint || !prompt) {
+        alert("Please enter both endpoint and prompt.");
+        return;
+      }
+
+      responseBox.textContent = "Streaming...\n";
+
+      try {
+        const res = await fetch(`${endpoint}/api/generate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model,
+            prompt,
+            stream: true
+          })
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          responseBox.textContent = `❌ Error ${res.status}: ${errorText}`;
+          return;
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+
+        let buffer = "";
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          responseBox.textContent += buffer;
+          buffer = "";
+        }
+      } catch (err) {
+        responseBox.textContent = "Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
