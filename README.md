@@ -1,8 +1,3 @@
-# Ollama
-
-Absolutely! Here is a **professional, comprehensive, and modern `README.md`** for your project, covering all components and real-world usage, based on your screenshots and files.
-
----
 
 # Ollama Kubernetes LLM Cluster with Monitoring, Autoscaling, Chaos, and Load Testing
 
@@ -279,11 +274,3 @@ ngrok http 8089
 # Check Grafana (find node port/ingress)
 kubectl get svc -n <grafana-namespace>
 ```
-
----
-
-> **Have questions or want custom integrations?** Open an issue or discussion!
-
----
-
-Let me know if you want a **shorter version**, **add diagrams**, or any other section added!
